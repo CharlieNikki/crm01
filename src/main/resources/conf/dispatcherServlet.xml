@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--dispatcherServlet拦截所有url请求-->
+    <mvc:default-servlet-handler />
+    <!--配置注解驱动-->
+    <mvc:annotation-driven />
+
+    <!--springmvc配置文件，声明controller和其他web的相关配置-->
+    <!--声明组件扫描器,扫描@Controller注解-->
+    <context:component-scan base-package="org.charlienikki.crm.web.controller" />
+    <context:component-scan base-package="org.charlienikki.crm.settings.web.controller" />
+    <context:component-scan base-package="org.charlienikki.crm.workbench.web.controller" />
+
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+        <!--前缀-->
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <!--后缀-->
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!--配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--
+                指定拦截器拦截的请求路径
+            -->
+            <mvc:mapping path="/settings/**"/>
+            <mvc:mapping path="/workbench/**"/>
+            <!--配置拦截器将排除拦截的路径-->
+            <mvc:exclude-mapping path="/settings/qx/user/toLogin.do"/>
+            <mvc:exclude-mapping path="/settings/qx/user/login.do"/>
+            <!--声明拦截器对象-->
+            <bean class="org.charlienikki.crm.web.interceptor.LoginInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--
+        注解驱动
+            1. 响应ajax请求，返回json
+            2. 解决静态资源访问的问题
+    -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="#{1024*1024*5}" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>
+
+
+</beans>

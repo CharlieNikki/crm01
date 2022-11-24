@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--spring配置文件，声明dao，service和工具类等对象-->
+
+    <!--加载配置文件-->
+    <context:property-placeholder location="classpath:conf/jdbc/jdbc.properties" />
+
+    <!--声明数据源，连接数据库-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+
+    <!--SqlSessionFactoryBean创建SqlSessionFactory-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:conf/mybatis.xml" />
+    </bean>
+
+    <!--声明mybatis的扫描器，创建dao对象-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--建议复制粘贴，不要自己手动拼写单词，容易写错-->
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory" />
+        <!--要使用动态代理扫描的包名(mapper)-->
+        <property name="basePackage" value="org.charlienikki.crm.settings.mapper,
+                                            org.charlienikki.crm.workbench.mapper" />
+    </bean>
+
+    <!--创建service对象，声明service的注解-->
+    <context:component-scan base-package="org.charlienikki.crm.settings.service" />
+    <context:component-scan base-package="org.charlienikki.crm.workbench.service" />
+
+    <!--事务的配置（注解） aspectJ-->
+
+</beans>
